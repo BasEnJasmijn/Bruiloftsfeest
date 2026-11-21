@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R.S.V.P. — Bruiloftsfeest van Jasmijn &amp; Bas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --accent: #5b8bb2;
+    --accent-dark: #47708f;
+    --accent-soft: #dcebf6;
+    --ink: #2f3e4d;
+    --ink-soft: #64788c;
+    --paper: #f2f9fe;
+    --line: #d7e6f1;
+    --field: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Nunito Sans", system-ui, sans-serif;
+    color: var(--ink);
+    background: linear-gradient(180deg, #e4f2fc 0%, #f2f9fe 45%, #eaf4fb 100%);
+    display: flex;
+    justify-content: center;
+    padding: 40px 16px 190px;
+    position: relative;
+  }
+  .mountains {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 190px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 640px;
+    background: #fdfeff;
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    padding: 44px 40px 36px;
+    box-shadow: 0 24px 60px -30px rgba(47, 90, 130, .4);
+  }
+  header { text-align: center; margin-bottom: 24px; }
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: .18em;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 0 0 10px;
+  }
+  h1 {
+    font-family: "Playfair Display", serif;
+    font-size: clamp(30px, 6vw, 42px);
+    margin: 0 0 12px;
+    line-height: 1.15;
+  }
+  h1 .amp { color: var(--accent); font-style: italic; }
+  .meta { color: var(--ink-soft); margin: 0; font-size: 15px; }
+  .meta .dot { margin: 0 7px; color: var(--accent); }
+  .tagline { color: var(--ink-soft); font-size: 14px; margin: 8px 0 0; font-style: italic; }
+  .divider { display: flex; justify-content: center; margin: 18px 0 26px; }
+  .divider svg { width: 220px; height: 34px; }
+  form { display: flex; flex-direction: column; gap: 22px; }
+  .group { display: flex; flex-direction: column; gap: 8px; }
+  label, .group > .label {
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: .01em;
+  }
+  .label .req { color: var(--accent); }
+  .hint { color: var(--ink-soft); font-size: 13px; margin: -2px 0 0; }
+  input[type="text"], textarea {
+    font: inherit;
+    color: var(--ink);
+    background: var(--field);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 11px 14px;
+    width: 100%;
+  }
+  textarea { resize: vertical; min-height: 76px; }
+  input:focus, textarea:focus, button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  fieldset {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .choice { position: relative; flex: 1 1 180px; }
+  .choice input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+  .choice span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 11px 14px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--field);
+    font-weight: 600;
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  .choice:hover span { border-color: var(--accent-soft); background: #f6fafe; }
+  .choice input:checked + span {
+    background: var(--accent);
+    border-color: var(--accent-dark);
+    color: #fff;
+  }
+  .choice input:focus-visible + span { outline: 2px solid var(--accent-dark); outline-offset: 2px; }
+  .sub { padding-left: 18px; border-left: 2px solid var(--line); margin-left: 4px; }
+  .hidden { display: none; }
+  button[type="submit"] {
+    font: inherit;
+    font-weight: 700;
+    font-size: 16px;
+    color: #fff;
+    background: var(--accent);
+    border: 0;
+    border-radius: 999px;
+    padding: 14px 22px;
+    cursor: pointer;
+    transition: background .15s ease, transform .15s ease;
+    margin-top: 4px;
+  }
+  button[type="submit"]:hover { background: var(--accent-dark); transform: translateY(-1px); }
+  button[type="submit"]:disabled { opacity: .6; cursor: wait; transform: none; }
+  #plekInfo { color: var(--ink-soft); font-size: 13px; margin: -18px 0 0; text-align: center; }
+  #formStatus { display: none; font-size: 14px; font-weight: 600; margin: 0; }
+  #formStatus.error { display: block; color: #a3502e; }
+  #formStatus.info { display: block; color: var(--ink-soft); }
+  #volBanner {
+    display: none;
+    background: var(--accent-soft);
+    border: 1px solid #b9d4e8;
+    border-radius: 16px;
+    padding: 20px 22px;
+    text-align: center;
+  }
+  #volBanner h2 {
+    font-family: "Playfair Display", serif;
+    font-size: 22px;
+    margin: 0 0 8px;
+  }
+  #volBanner p { color: var(--ink-soft); margin: 0; font-size: 14.5px; }
+  #successPanel {
+    display: none;
+    text-align: center;
+    padding: 26px 10px 8px;
+  }
+  #successPanel h2 {
+    font-family: "Playfair Display", serif;
+    font-size: 26px;
+    margin: 0 0 10px;
+  }
+  #successPanel p { color: var(--ink-soft); margin: 0 auto; max-width: 42ch; }
+  footer {
+    margin-top: 30px;
+    padding-top: 18px;
+    border-top: 1px dashed var(--line);
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 12.5px;
+  }
+  @media (max-width: 480px) {
+    .card { padding: 30px 22px 26px; }
+  }
+</style>
+</head>
+<body>
+<svg class="mountains" viewBox="0 0 1440 260" preserveAspectRatio="none" aria-hidden="true">
+  <path fill="#d7eaf6" d="M0,260 L0,150 L120,70 L260,170 L360,100 L520,190 L640,60 L800,180 L920,110 L1080,190 L1200,90 L1330,180 L1440,120 L1440,260 Z"></path>
+  <path fill="#b3d3ea" d="M0,260 L0,210 L90,120 L200,215 L300,140 L430,230 L560,110 L700,225 L820,150 L960,235 L1060,130 L1190,225 L1300,160 L1440,235 L1440,260 Z"></path>
+  <path fill="#ffffff" opacity=".85" d="M560,110 L538,136 L551,127 L562,139 L573,127 L582,136 Z"></path>
+  <path fill="#ffffff" opacity=".85" d="M1060,130 L1042,151 L1053,144 L1063,154 L1073,145 L1081,151 Z"></path>
+  <path fill="#ffffff" opacity=".85" d="M640,60 L624,79 L633,73 L641,82 L650,72 L657,79 Z"></path>
+  <path fill="#8fb8d8" d="M0,260 L0,235 L140,170 L280,245 L420,180 L600,250 L760,175 L900,248 L1040,185 L1200,250 L1320,195 L1440,248 L1440,260 Z"></path>
+</svg>
+
+<main class="card">
+  <header>
+    <p class="eyebrow">Huwelijk in de bergen &nbsp;♡</p>
+    <h1>Jasmijn <span class="amp">&amp;</span> Bas</h1>
+    <p class="meta">zaterdag 29 mei 2027<span class="dot">•</span>Bunnik</p>
+    <p class="tagline">We vieren het met een berg geluk — en jullie zijn erbij, hopelijk!</p>
+  </header>
+
+  <div class="divider" aria-hidden="true">
+    <svg viewBox="0 0 220 34">
+      <path fill="none" stroke="#5b8bb2" stroke-width="2" d="M2,30 L38,6 L58,20 L82,2 L110,26 L138,8 L164,22 L186,10 L218,30"></path>
+      <path fill="#ffffff" d="M82,2 L75,11 L79,8 L82,12 L86,8 L89,11 Z"></path>
+      <path fill="#ffffff" d="M38,6 L33,13 L36,10 L39,14 L42,10 L44,13 Z"></path>
+    </svg>
+  </div>
+
+  <div id="volBanner">
+    <h2>🏔 Het feest zit vol</h2>
+    <p>Alle 55 plekken zijn vergeven. Mocht er nog een plek vrijkomen, dan laten we het weten!</p>
+  </div>
+
+  <form id="rsvpForm" novalidate>
+    <div class="group">
+      <label for="naam">Je naam <span class="req">*</span></label>
+      <input type="text" id="naam" name="naam" autocomplete="name" placeholder="Voor- en achternaam" required>
+    </div>
+
+    <div class="group">
+      <span class="label">Kom je naar ons feest? <span class="req">*</span></span>
+      <fieldset id="komtField">
+        <label class="choice">
+          <input type="radio" name="komt" value="ja" required>
+          <span>Ja, ik ben erbij! 🎉</span>
+        </label>
+        <label class="choice">
+          <input type="radio" name="komt" value="nee" required>
+          <span>Helaas, ik kan niet</span>
+        </label>
+      </fieldset>
+    </div>
+
+    <div id="komendeDetails" class="group hidden">
+      <span class="label">Neem je een partner of gast mee?</span>
+      <fieldset>
+        <label class="choice">
+          <input type="radio" name="gastMee" value="nee" checked>
+          <span>Nee, ik kom alleen</span>
+        </label>
+        <label class="choice">
+          <input type="radio" name="gastMee" value="ja">
+          <span>Ja, met z'n tweeën</span>
+        </label>
+      </fieldset>
+      <div class="sub">
+        <div class="group hidden" id="gastNaamGroep">
+          <label for="naamGast">Naam van je gast</label>
+          <input type="text" id="naamGast" name="naamGast" placeholder="Naam van je partner of gast">
+        </div>
+      </div>
+    </div>
+
+    <div id="dieetGroep" class="group hidden">
+      <label for="dieetwensen">Dieetwensen of allergieën</label>
+      <textarea id="dieetwensen" name="dieetwensen" placeholder="Bijv. vegetarisch, glutenvrij, notenallergie…"></textarea>
+    </div>
+
+    <div id="sprekenGroep" class="group hidden">
+      <span class="label">Wil je graag iets zeggen op het feest?</span>
+      <fieldset>
+        <label class="choice">
+          <input type="radio" name="zegtIets" value="ja">
+          <span>Ja, graag!</span>
+        </label>
+        <label class="choice">
+          <input type="radio" name="zegtIets" value="nee" checked>
+          <span>Liever niet</span>
+        </label>
+      </fieldset>
+      <div class="sub">
+        <div class="group hidden" id="zegtkstGroep">
+          <label for="toelichting">Wat wil je vertellen?</label>
+          <textarea id="toelichting" name="toelichting" placeholder="Bijv. een toast, een verhaal, een liedje… Vertel kort waar het over gaat."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" id="submitBtn">Aanmelding versturen</button>
+    <p id="plekInfo" aria-live="polite"></p>
+    <p id="formStatus" role="status" aria-live="polite"></p>
+  </form>
+
+  <div id="successPanel">
+    <h2>Bedankt! 🎊</h2>
+    <p id="successText">Je aanmelding is verstuurd.</p>
+  </div>
+
+  <footer>Vragen? Mail ons dan gerust. We kijken uit naar je reactie op de top van de dag!</footer>
+</main>
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjmdQuemM1PWCHK3jREfg7PhTMGTLMUvZ1JNzuMAwOzBmDmaFawKmsol5Xy6ProxeyHw/exec";
+
+  const form = document.getElementById("rsvpForm");
+  const successPanel = document.getElementById("successPanel");
+  const successText = document.getElementById("successText");
+  const formStatus = document.getElementById("formStatus");
+  const submitBtn = document.getElementById("submitBtn");
+  const volBanner = document.getElementById("volBanner");
+  const plekInfo = document.getElementById("plekInfo");
+
+  let statusInfo = null;
+
+  function sluitFormulier() {
+    form.style.display = "none";
+    volBanner.style.display = "block";
+  }
+
+  async function checkCapaciteit() {
+    if (!SCRIPT_URL || SCRIPT_URL.startsWith("PLAK_HIER")) return;
+    try {
+      const res = await fetch(SCRIPT_URL + "?action=status");
+      statusInfo = await res.json();
+      updateCapaciteitUI();
+    } catch (err) {
+      statusInfo = null;
+    }
+  }
+
+  function nodigNu() {
+    if (form.elements.komt.value !== "ja") return 0;
+    return form.elements.gastMee.value === "ja" ? 2 : 1;
+  }
+
+  function updateCapaciteitUI() {
+    if (!statusInfo || !statusInfo.ok) return;
+    if (statusInfo.vol) {
+      sluitFormulier();
+      return;
+    }
+    const nodig = nodigNu();
+    if (nodig === 0) {
+      plekInfo.textContent = `Nog ${statusInfo.beschikbaar} van de ${statusInfo.cap} plekken beschikbaar.`;
+    } else if (nodig > statusInfo.beschikbaar) {
+      plekInfo.textContent = `Helaas: er is nog maar plek voor ${statusInfo.beschikbaar} ${statusInfo.beschikbaar === 1 ? "persoon" : "personen"}.`;
+    } else {
+      plekInfo.textContent = "";
+    }
+  }
+
+  form.addEventListener("change", updateCapaciteitUI);
+  checkCapaciteit();
+
+  function setStatus(text, kind) {
+    formStatus.textContent = text;
+    formStatus.className = kind || "";
+  }
+
+  function validationError() {
+    if (!form.elements.naam.value.trim()) return "Vul je naam in.";
+    if (form.elements.komt.value === "ja" && form.elements.gastMee.value === "ja" && !form.elements.naamGast.value.trim()) {
+      return "Vul de naam van je gast in.";
+    }
+    return null;
+  }
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const error = validationError();
+    if (error) {
+      setStatus(error, "error");
+      return;
+    }
+    if (!SCRIPT_URL || SCRIPT_URL.startsWith("PLAK_HIER")) {
+      setStatus("De pagina is nog niet gekoppeld aan het formulier-register (zie de instructies).", "error");
+      return;
+    }
+
+    const komtJa = form.elements.komt.value === "ja";
+    const nodig = nodigNu();
+
+    submitBtn.disabled = true;
+    setStatus("Even controleren of er nog plek is…", "info");
+
+    try {
+      if (komtJa) {
+        const res = await fetch(SCRIPT_URL + "?action=status");
+        const st = await res.json();
+        if (st.ok && (st.vol || nodig > st.beschikbaar)) {
+          submitBtn.disabled = false;
+          setStatus("", "");
+          updateCapaciteitUI();
+          setStatus(st.vol
+            ? "Helaas, het feest is nét vol geraakt — alle 55 plekken zijn vergeven."
+            : `Helaas, er is nog maar plek voor ${st.beschikbaar} ${st.beschikbaar === 1 ? "persoon" : "personen"}.`, "error");
+          if (st.vol) sluitFormulier();
+          return;
+        }
+      }
+
+      setStatus("Je aanmelding wordt verstuurd…", "info");
+      await fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          naam: form.elements.naam.value.trim(),
+          komt: komtJa ? "Ja" : "Nee",
+          gastMee: komtJa && form.elements.gastMee.value === "ja" ? "Ja" : "Nee",
+          naamGast: komtJa && form.elements.gastMee.value === "ja" ? form.elements.naamGast.value.trim() : "",
+          dieetwensen: komtJa ? form.elements.dieetwensen.value.trim() : "",
+          zegtIets: komtJa && form.elements.zegtIets.value === "ja" ? "Ja" : "Nee",
+          toelichting: komtJa && form.elements.zegtIets.value === "ja" ? form.elements.toelichting.value.trim() : ""
+        })
+      });
+      form.style.display = "none";
+      volBanner.style.display = "none";
+      successText.textContent = komtJa
+        ? "Je staat op de gastenlijst. We zoeken je op 29 mei in Bunnik! 💐"
+        : "Wat jammer dat je niet kunt komen — bedankt voor het laten weten!";
+      successPanel.style.display = "block";
+    } catch (err) {
+      submitBtn.disabled = false;
+      setStatus("Er ging iets mis bij het versturen. Probeer het nog een keer.", "error");
+    }
+  });
+</script>
+</body>
+</html>
