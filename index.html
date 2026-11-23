@@ -326,6 +326,18 @@
   function nodigNu() {
     if (form.elements.komt.value !== "ja") return 0;
     return form.elements.gastMee.value === "ja" ? 2 : 1;
+  }  
+  
+  function updateVisibility() {
+    const komtJa = form.elements.komt.value === "ja";
+    const gastJa = form.elements.gastMee.value === "ja";
+    const zegtJa = form.elements.zegtIets.value === "ja";
+
+    document.getElementById("komendeDetails").classList.toggle("hidden", !komtJa);
+    document.getElementById("dieetGroep").classList.toggle("hidden", !komtJa);
+    document.getElementById("sprekenGroep").classList.toggle("hidden", !komtJa);
+    document.getElementById("gastNaamGroep").classList.toggle("hidden", !(komtJa && gastJa));
+    document.getElementById("zegtkstGroep").classList.toggle("hidden", !(komtJa && zegtJa));
   }
 
   function updateCapaciteitUI() {
@@ -344,7 +356,12 @@
     }
   }
 
-  form.addEventListener("change", updateCapaciteitUI);
+    form.addEventListener("change", () => {
+    updateVisibility();
+    updateCapaciteitUI();
+  });
+
+  updateVisibility();
   checkCapaciteit();
 
   function setStatus(text, kind) {
